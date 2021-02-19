@@ -45,17 +45,15 @@ app.get("/b/:id", (req, res) => {
 
 //POST METHOD
 app.post("/b/:id", (req, res) => {
-  const newTask = req.body;
+  const newData = req.body;
   const id = req.params.id;
   const binContent = JSON.parse(fs.readFileSync(`./bins/${id}.json`));
-  const myTodo = binContent["my-todo"];
-  newTask.id = createId();
-  while (idExist(newTask.id)) {
-    newTask.id = createId();
+  newData.id = createId();
+  while (idExist(newData.id)) {
+    newData.id = createId();
   }
-  myTodo.push(newTask);
+  binContent.push(newData);
   fs.writeFileSync(`./bins/${id}.json`, JSON.stringify(binContent, null, 4));
-
   res.send(binContent);
 });
 
@@ -90,15 +88,14 @@ function idExist(id) {
 
 //DELETE METHOD
 app.delete("/b/:id", (req, res) => {
-  const newTask = req.body;
+  const deletedData = req.body;
   const id = req.params.id;
-  const taskId = newTask.id;
+  const dataId = deletedData.id;
   const binContent = JSON.parse(fs.readFileSync(`./bins/${id}.json`));
-  const myTodo = binContent["my-todo"];
-
-  for (let taskNumber in myTodo) {
-    if (myTodo[taskNumber].id === taskId) {
-      myTodo.splice(taskNumber, 1);
+  const data = binContent;
+  for (let fileNumber in data) {
+    if (data[fileNumber].id === dataId) {
+      data.splice(taskNumber, 1);
       break;
     }
   }
