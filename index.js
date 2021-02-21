@@ -8,6 +8,10 @@ const { parse } = require("path");
 
 app.use(express.json());
 
+app.use(function (req, res, next) {
+  setTimeout(next, 1000);
+});
+
 //PUT METHOD
 app.put("/b/:id", (req, res) => {
   let body = req.body;
