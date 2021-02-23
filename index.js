@@ -4,6 +4,7 @@ const { json } = require("express");
 const express = require("express");
 let app = express();
 const fs = require("fs");
+const { get } = require("http");
 const { parse } = require("path");
 
 app.use(express.json());
@@ -40,10 +41,12 @@ app.put("/b/:id", (req, res) => {
 app.get("/b/:id", (req, res) => {
   const id = req.params.id;
   try {
-    const binContent = fs.readFileSync(`./bins/${id}.Json`);
-    res.send(binContent);
+    const binContent = JSON.parse(fs.readFileSync(`./bins/${id}.json`));
+    res.json(binContent);
   } catch (e) {
-    res.status(422).json({ message: "Invalid Record ID" });
+    var format = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
+    if (format.test(id)) res.status(422).json({ message: "Invalid Record ID" });
+    else res.status(404).json({ message: "Bin is not found" });
   }
 });
 
@@ -127,3 +130,5 @@ app.get("/b", (req, res) => {
 app.listen(3000, () => {
   console.log("listening on 3000.");
 });
+
+module.exports = app;
