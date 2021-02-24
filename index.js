@@ -23,7 +23,6 @@ app.put("/b/:id", (req, res) => {
       message: "Bin not found",
       success: false,
     });
-    return;
   }
 
   fs.writeFileSync(`./bins/${id}.json`, JSON.stringify(body, null, 4));
@@ -53,15 +52,20 @@ app.get("/b/:id", (req, res) => {
 //POST METHOD
 app.post("/b/:id", (req, res) => {
   const newData = req.body;
-  const id = req.params.id;
-  const binContent = JSON.parse(fs.readFileSync(`./bins/${id}.json`));
-  newData.id = createId();
-  while (idExist(newData.id)) {
+  console.log(newData.text);
+  if (newData.text) {
+    const id = req.params.id;
+    const binContent = JSON.parse(fs.readFileSync(`./bins/${id}.json`));
     newData.id = createId();
+    while (idExist(newData.id)) {
+      newData.id = createId();
+    }
+    binContent.push(newData);
+    fs.writeFileSync(`./bins/${id}.json`, JSON.stringify(binContent, null, 4));
+    res.send(binContent);
+  } else {
+    res.status(400).json({ message: "Invalid data." });
   }
-  binContent.push(newData);
-  fs.writeFileSync(`./bins/${id}.json`, JSON.stringify(binContent, null, 4));
-  res.send(binContent);
 });
 
 //This method creates an random id for each task.
@@ -81,7 +85,7 @@ function createId() {
 }
 
 //This method checks if the id already exist in one of the tasks.
-function idExist(id) {
+let idExist = function (id) {
   let existsIDs = JSON.parse(fs.readFileSync(`./bins/ids.json`));
   for (let i = 0; i < existsIDs.length; i++) {
     if (id === existsIDs[i]) {
@@ -91,7 +95,7 @@ function idExist(id) {
   existsIDs.push(id);
   fs.writeFileSync(`./bins/ids.json`, JSON.stringify(existsIDs, null, 4));
   return false;
-}
+};
 
 //DELETE METHOD
 app.delete("/b/:id", (req, res) => {
@@ -131,4 +135,4 @@ app.listen(3000, () => {
   console.log("listening on 3000.");
 });
 
-module.exports = app;
+module.exports = { app, idExist };
