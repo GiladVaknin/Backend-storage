@@ -45,3 +45,5 @@ test("can update a bin by id", async () => {
   const req = await request(app).put("/b/bin").send(newBin);
   expect(req.status).toBe(200);
 });
+
+test;
